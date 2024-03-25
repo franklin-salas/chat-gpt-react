@@ -4,7 +4,7 @@
   
  Principal
 
-  ![preview img](/preview/principal.p)
+  ![preview img](/preview/principal.png)
 
 
 

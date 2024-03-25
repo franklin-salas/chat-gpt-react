@@ -1,4 +1,17 @@
-# React + TypeScript + Vite
+#Chart Gpt React 
+
+- **preview**
+  
+ Principal
+
+  ![preview img](/preview/principal.p)
+
+
+
+
+
+
+## React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

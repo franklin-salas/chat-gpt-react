@@ -4,8 +4,13 @@
   
  Principal
 
+-- Comparación de objetos -> Pros y Contras 
+
   ![preview img](/preview/principal.png)
 
+--   Crear imagenes y variaciones con prompts -> Imagenes
+
+  ![preview img](/preview/generador.png)
 
 
 

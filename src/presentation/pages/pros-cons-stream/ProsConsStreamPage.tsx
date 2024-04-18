@@ -1,7 +1,7 @@
 
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { GptMessage, MyMessage, TextMessageBox, TypingLoader } from "../../components";
-import { postConsDiscusserUseCase } from "../../../core";
+import { postConsDiscusserStreamGeneratorUseCase, postConsDiscusserStreamUseCase, postConsDiscusserUseCase } from "../../../core";
 
 
 interface Message {
@@ -10,22 +10,62 @@ interface Message {
 }
 export const ProsConsStreamPage = () => {
 
+  const abortController = useRef(new AbortController());
+  const isRunning = useRef(false);
   const [isloading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
 
   const handlePost = async( text:string) => {
+
+    if(isRunning.current){
+      abortController.current.abort();
+      abortController.current = new AbortController();
+
+    }
       setIsLoading(true);
+      isRunning.current= true;
       setMessages((prev) => [...prev, { text:text, isGpt:false}]);
       //TODO: use case
-
-      const data = await postConsDiscusserUseCase(text); 
-      //console.log({data});
-
-    setMessages((prev) => [...prev, { text: data.content, isGpt:true}]);
-
+     const stream =  postConsDiscusserStreamGeneratorUseCase(text, abortController.current.signal); 
 
       setIsLoading(false);
-       //TODO: añadir mensaje d gpt en true
+      setMessages((prev) => [...prev, { text:'', isGpt:true}]);
+
+      for await ( const text of stream){
+            setMessages((messages) => {
+          const newmessages = [...messages];
+          newmessages[newmessages.length - 1].text = text;
+          return newmessages;
+        });
+      }
+      isRunning.current= false;
+    //  const reader = await postConsDiscusserStreamUseCase(text); 
+
+    //   setIsLoading(false);
+    //    //TODO: añadir mensaje d gpt en true
+
+    //    if(!reader){
+    //     setMessages((prev) => [...prev, { text:"::: Error preguntar de nuevo.", isGpt:true}]);
+    //   return; 
+    //   }
+    //   const decoder = new TextDecoder();
+    //   let message = '';
+    //   setMessages((prev) => [...prev, { text:message, isGpt:true}]);
+    //   while(true){
+    //     const {value, done} = await reader.read();
+    //     if(done){
+    //       break;
+    //     }
+
+    //     const decodeChunk = decoder.decode(value, {stream:true});
+    //     message += decodeChunk;
+    //     setMessages((messages) => {
+    //       const newmessages = [...messages];
+    //       newmessages[newmessages.length - 1].text = message;
+    //       return newmessages;
+    //     });
+    //   }
+
   }
 
   return (

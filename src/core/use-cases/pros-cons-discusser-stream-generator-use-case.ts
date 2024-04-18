@@ -1,6 +1,6 @@
-import { PosConsResponse } from "../../interfaces";
 
-export const postConsDiscusserStreamUseCase = async (prompt: string) => {
+
+export async function* postConsDiscusserStreamGeneratorUseCase(prompt: string , abortAsignal:AbortSignal) {
 
     try {
         const resp = await fetch(`${import.meta.env.VITE_GPT_API}/pros-cons-discusser-stream`,
@@ -11,28 +11,28 @@ export const postConsDiscusserStreamUseCase = async (prompt: string) => {
             },
             body: JSON.stringify({prompt}),
             //todo: abortSignal
+            signal: abortAsignal
         });
         if(!resp.ok) throw new Error('No se pudo prosesar la solicitud.');
         
         const reader = resp.body?.getReader();
 
-
         if(!reader){
             return null;
         }
 
-        return reader;
-        // const decoder = new TextDecoder();
-        // let text = '';
-        // while(true){
-        //     const {value, done} = await reader.read();
-        //     if(done){
-        //         break;
-        //     }
+        const decoder = new TextDecoder();
+        let text = '';
+        while(true){
+            const {value, done} = await reader.read();
+            if(done){
+                break;
+            }
 
-        //     const decoderChunk = decoder.decode( value, {stream: true});
-        //     text += decoderChunk; 
-        // }
+            const decoderChunk = decoder.decode( value, {stream: true});
+            text += decoderChunk; 
+            yield text;
+        }
 
     } catch (error: any) {
         return null;

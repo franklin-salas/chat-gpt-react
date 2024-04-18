@@ -23,7 +23,7 @@ export const ProsConsPage = () => {
 
     setMessages((prev) => [...prev, { text: data.content, isGpt:true}]);
 
-
+      console.log({data:data.content})
       setIsLoading(false);
        //TODO: añadir mensaje d gpt en true
   }
